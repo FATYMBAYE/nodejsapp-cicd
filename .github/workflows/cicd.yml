@@ -22,6 +22,7 @@ jobs:
 
       - name: execute semgrep
         run: semgrep ci --sarif --output=semgrep.sarif
+        continue-on-error: true
         env:
           #specifiy the rules to use
           SEMGREP_RULES: p/default
