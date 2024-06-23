@@ -6,13 +6,13 @@ chai.should();
 chai.use(chaiHttp);
 
 describe("GET /", () => {
-  it("should return Hello World", (done) => {
+  it("should return Hellllo World", (done) => {
     chai
       .request(app)
       .get("/")
       .end((err, res) => {
         res.should.have.status(200);
-        res.text.should.be.eql("Helllllo World!");
+        res.text.should.be.eql("Hello World!");
         done();
       });
   });
