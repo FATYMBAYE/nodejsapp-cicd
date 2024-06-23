@@ -19,7 +19,6 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
-
       - name: execute semgrep
         run: semgrep ci --sarif --output=semgrep.sarif
         continue-on-error: true
@@ -95,7 +94,6 @@ jobs:
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: ./Dockerfile
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -110,3 +108,7 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/projetdvp:latest
+      - name: Run trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.8.0
+        with:
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/projetdvp:latest
