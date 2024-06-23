@@ -6,7 +6,7 @@ chai.should();
 chai.use(chaiHttp);
 
 describe("GET /", () => {
-  it("should return Hello World", (done) => {
+  it("should return Helllo World", (done) => {
     chai
       .request(app)
       .get("/")
