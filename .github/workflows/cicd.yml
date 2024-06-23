@@ -9,8 +9,33 @@ on:
       - main
 
 jobs:
+  semgrep:
+    name: semgrep Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    container:
+      image: semgrep/semgrep:latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: execute semgrep
+        run: semgrep ci --sarif --output=semgrep.sarif
+        continue-on-error: true
+        env:
+          #specifiy the rules to use
+          SEMGREP_RULES: p/default
+
+      - name: "upload sarif file Github codeQL"
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+
   push-Feature-event:
     name: " Feature Branch"
+    needs: semgrep
     strategy:
       matrix:
         node-version: [16, 18, 20]
@@ -27,7 +52,7 @@ jobs:
 
   pull_request-event:
     name: "Pull Request Event Phase"
-    if: github.event_name == 'pull_request' && startsWith(github.ref , 'refs/heads/main')
+    if: github.event_name == 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,11 +65,13 @@ jobs:
 
       - name: Run unit tests
         run: npm test
+      - run: npm run lint
       - name: Run security scans
         run: npm audit
 
   push-merge-event:
     name: "build_and_publish"
+    needs: semgrep
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -63,6 +90,10 @@ jobs:
         run: npm test
       - name: Run security scans
         run: npm audit
+      - name: Run Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: ./Dockerfile
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
