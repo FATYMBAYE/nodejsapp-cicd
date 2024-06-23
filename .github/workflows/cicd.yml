@@ -62,6 +62,15 @@ jobs:
 
       - name: Run unit tests
         run: npm test
+      - name: "Install ESLint"
+        run: npm install eslint --save-dev
+      - name: "Add lint script"
+        run: |
+          echo '{
+            "scripts": {
+              "lint": "eslint ."
+            }
+          }' >> package.json
 
       - name: Run static analysis
         run: npm run lint
