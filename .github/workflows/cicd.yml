@@ -17,9 +17,6 @@ jobs:
     container:
       image: semgrep/semgrep:latest
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v3
-
       - name: execute semgrep
         run: semgrep ci --sarif --output=semgrep.sarif
         continue-on-error: true
