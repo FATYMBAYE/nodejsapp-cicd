@@ -1,83 +1,87 @@
-### README pour le Dépôt de l'Application Node.js
+# Pipeline CI/CD pour le Projet Node.js
 
----
+Ce README décrit le pipeline CI/CD mis en place pour notre projet Node.js utilisant GitHub Actions.
 
-# Application de Prise de Notes
+## Structure du Pipeline
 
-Cette application est une simple application web de prise de notes construite avec Node.js et Express. Elle est conçue pour démontrer la mise en place d'un pipeline CI/CD avec GitHub Actions.
+Notre pipeline est divisé en plusieurs jobs, chacun s'exécutant dans des conditions spécifiques :
 
-## Prérequis
+1. Analyse Semgrep
 
-- Node.js (version 14 ou supérieure)
-- Docker
-- Un compte GitHub
-- Un compte Docker Hub
-- Un compte Heroku (facultatif)
+2. Job pour les branches de feature
 
-## Installation
+3. Job pour les pull requests
 
-1. Clonez le dépôt GitHub :
+4. Job pour les merges sur la branche principale
 
-```sh
-git clone <URL_DU_DÉPÔT>
-cd <NOM_DU_DOSSIER>
-```
+## Détail des Jobs
 
-2. Installez les dépendances Node.js :
+### 1. Analyse Semgrep
 
-```sh
-npm install
-```
+- S'exécute sur les événements (push et pull request sur la branche main)
 
-## Exécution de l'Application
+- Utilise Semgrep pour l'analyse statique du code
 
-Pour démarrer l'application en local, exécutez :
+- Génère un rapport SARIF et l'uploade pour l'analyse CodeQL de GitHub
 
-```sh
-npm start
-```
+### 2. Job pour les Branches de Feature
 
-L'application sera accessible sur http://localhost:3000.
+- S'exécute lors d'un push sur une branche commençant par "feature/"
 
-## Tests
+- Teste l'application sur plusieurs versions de Node.js (16, 18, 20)
 
-Pour exécuter les tests unitaires, utilisez :
+- Exécute les tests unitaires
 
-```sh
-npm test
-```
+### 3. Job pour les Pull Requests
 
-## Docker
+- S'exécute lors d'une pull request vers la branche main
 
-### Construction de l'Image Docker
+- Installe les dépendances
 
-Pour construire l'image Docker de l'application, exécutez :
+- Exécute les tests unitaires
 
-```sh
-docker build -t sample-app .
-```
+- Lance le linter
 
-### Exécution de l'Application avec Docker
+- Effectue un scan de sécurité avec npm audit
 
-Pour exécuter l'application dans un conteneur Docker, utilisez :
+### 4. Job pour les Merges sur Main
 
-```sh
-docker run -p 3000:3000 sample-app
-```
+- S'exécute lors d'un push sur la branche main après un merge
 
-L'application sera accessible sur http://localhost:3000.
+- Exécute les tests unitaires
 
-### Push de l'Image Docker vers Docker Hub
+- Effectue un scan de sécurité
 
-1. Connectez-vous à Docker Hub :
+- Analyse le Dockerfile avec Hadolint
 
-```sh
-docker login -u <votre_nom_d'utilisateur>
-```
+- Construit et pousse l'image Docker
 
-2. Poussez l'image Docker :
+- Scanne l'image Docker pour les vulnérabilités avec Trivy
 
-```sh
-docker tag sample-app <votre_nom_d'utilisateur>/sample-app:latest
-docker push <votre_nom_d'utilisateur>/sample-app:latest
-```
+## Configuration Requise
+
+Pour que ce pipeline fonctionne correctement, on configure les secrets suivants dans le dépôt GitHub :
+
+- DOCKER_USERNAME: Votre nom d'utilisateur Docker Hub
+
+- DOCKER_PASSWORD: Votre mot de passe Docker Hub
+
+## Utilisation de Matrices
+
+Le job pour les branches de feature utilise une matrice pour tester l'application sur plusieurs versions de Node.js (16, 18, 20). Cela assure la compatibilité de l'application avec différentes versions de Node.js.
+
+## Outils Utilisés
+
+- Semgrep: Pour l'analyse statique du code
+
+- npm: Pour la gestion des dépendances et l'exécution des tests
+
+- Hadolint: Pour l'analyse du Dockerfile
+
+- Docker: Pour la conteneurisation de l'application
+
+- Trivy: Pour le scan des vulnérabilités de l'image Docker
+
+## Captures d'Écran
+
+voir le document pdf
