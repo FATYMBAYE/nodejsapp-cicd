@@ -12,7 +12,7 @@ describe("GET /", () => {
       .get("/")
       .end((err, res) => {
         res.should.have.status(200);
-        res.text.should.be.eql("Helllo World!");
+        res.text.should.be.eql("Hello World!");
         done();
       });
   });
