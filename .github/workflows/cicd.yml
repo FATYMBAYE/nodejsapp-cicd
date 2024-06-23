@@ -24,7 +24,7 @@ jobs:
 
   pull_request-event:
     name: "Pull Request Event Phase"
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
